@@ -1,0 +1,110 @@
+/* 전체 배경: 어두운 지하 도박장 느낌 */
+body {
+    background-color: #0c0d0c;
+    color: #4af626; /* 형광 녹색 */
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+h1 {
+    color: #8b0000; /* 핏빛 붉은색 */
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+    text-shadow: 2px 2px 0px #2b0000;
+    border-bottom: 3px double #8b0000;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+header p {
+    color: #8fa38b;
+    font-size: 1.1rem;
+}
+
+/* 프로젝트 카드를 담는 컨테이너 */
+#projects {
+    max-width: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* 게임 선택 카드 */
+.project-card {
+    background-color: #141713; /* 탁한 국방색 느낌 */
+    border: 2px solid #3f543f;
+    padding: 25px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.project-card h3 {
+    color: #4af626;
+    margin: 0;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+}
+
+.project-card p {
+    color: #8fa38b;
+    margin: 0;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* 🟢 실제 teamBuck으로 진입하는 버튼 스타일 */
+.enter-btn {
+    display: inline-block;
+    align-self: flex-start;
+    background-color: #222b21;
+    color: #4af626;
+    border: 2px solid #4af626;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    transition: all 0.1s ease-in-out;
+}
+
+/* 버튼에 마우스 올렸을 때 불빛 들어오는 효과 */
+.enter-btn:hover {
+    background-color: #4af626;
+    color: #0c0d0c;
+    box-shadow: 0 0 15px #4af626;
+    cursor: pointer;
+}
+
+/* 마우스 올렸을 때 카드 전체가 조금 더 밝아짐 */
+.project-card:hover {
+    border-color: #5a7a5a;
+    background-color: #181c17;
+}
+
+/* 비활성화된 두 번째 카드 스타일 */
+.project-card.disabled {
+    border: 2px dashed #222;
+    background-color: #050605;
+    opacity: 0.4;
+}
+
+.project-card.disabled .enter-btn {
+    border-color: #555;
+    color: #555;
+    background-color: transparent;
+    pointer-events: none; /* 클릭 안 되게 막음 */
+}
