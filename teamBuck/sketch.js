@@ -2,6 +2,7 @@ let noiseOffset = 0;
 let hud; // 2D UI 전용 화면
 let bgm;
 let bgmStarted = false;
+let gunSound;
 
 // ===== 게임 기본 변수 =====
 let userName;
@@ -42,6 +43,7 @@ let dealerSpeakTimer = 0;
 function preload() {
   soundFormats("mp3");
   bgm = loadSound("assets/334911__fraskoh__cellar-wind-tube.mp3");
+  gunSound = loadSound("assets/gunboom.mp3");
 }
 
 function setup() {
@@ -49,6 +51,7 @@ function setup() {
   noStroke();
   
   bgm.setVolume(0.35);
+  gunSound.setVolume(0.7);
   
   hud = createGraphics(windowWidth, windowHeight);
   hud.textFont("monospace");
@@ -974,6 +977,7 @@ function updateShooting() {
         resultStartTime = millis();
         gameState = "shootingResult";
       } else {
+        gunSound.play();
         gameState = "gameOver";
       }
     } else {
