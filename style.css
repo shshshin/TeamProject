@@ -1,6 +1,8 @@
-/* 전체 배경: 어두운 지하 도박장 느낌 */
+/* ==========================================
+    전체 배경: 완벽한 암흑의 지하 도박장
+   ========================================== */
 body {
-    background-color: #0c0d0c;
+    background-color: #000000; /* 🔴 애매한 녹색빛을 빼고 완벽한 칠흑색(#000000)으로 변경 */
     color: #4af626; /* 형광 녹색 */
     font-family: 'Courier New', monospace;
     margin: 0;
@@ -16,18 +18,20 @@ header {
     margin-bottom: 50px;
 }
 
+/* 고장난 네온사인 제목 (다크 배경에서 효과 극대화) */
 h1 {
-    color: #8b0000; /* 핏빛 붉은색 */
+    color: #ff1a1a; 
     font-size: 2.5rem;
     letter-spacing: 4px;
-    text-shadow: 2px 2px 0px #2b0000;
-    border-bottom: 3px double #8b0000;
+    text-shadow: 0 0 4px #ff1a1a, 0 0 12px #ff0000, 0 0 30px #ff0000;
+    border-bottom: 3px double #ff1a1a;
     padding-bottom: 10px;
     margin-bottom: 15px;
+    animation: neonFlicker 2.5s infinite;
 }
 
 header p {
-    color: #8fa38b;
+    color: #6e806a; /* 🔴 텍스트가 너무 밝아 분위기를 깨지 않도록 살짝 톤다운 */
     font-size: 1.1rem;
 }
 
@@ -40,10 +44,10 @@ header p {
     gap: 25px;
 }
 
-/* 게임 선택 카드 */
+/* 🔴 게임 선택 카드: 배경에 묻히지 않는 묵직한 다크 그레이 */
 .project-card {
-    background-color: #141713; /* 탁한 국방색 느낌 */
-    border: 2px solid #3f543f;
+    background-color: #0a0c0a; /* 완전히 어두운 베이스 */
+    border: 2px solid #1f2e1f;  /* 은은하게 경계만 주는 테두리 */
     padding: 25px;
     border-radius: 4px;
     display: flex;
@@ -66,11 +70,11 @@ header p {
     font-size: 0.95rem;
 }
 
-/* 🟢 실제 teamBuck으로 진입하는 버튼 스타일 */
+/* 실제 teamBuck으로 진입하는 버튼 스타일 */
 .enter-btn {
     display: inline-block;
     align-self: flex-start;
-    background-color: #222b21;
+    background-color: #0d140d; /* 🔴 버튼 내부도 다크하게 변경 */
     color: #4af626;
     border: 2px solid #4af626;
     padding: 10px 20px;
@@ -84,27 +88,42 @@ header p {
 /* 버튼에 마우스 올렸을 때 불빛 들어오는 효과 */
 .enter-btn:hover {
     background-color: #4af626;
-    color: #0c0d0c;
+    color: #000000; /* 🔴 글자색을 완전한 블랙으로 */
     box-shadow: 0 0 15px #4af626;
     cursor: pointer;
 }
 
-/* 마우스 올렸을 때 카드 전체가 조금 더 밝아짐 */
+/* 🔴 마우스 올렸을 때 카드 전체가 녹색 아우라로 빛나는 연출 추가 */
 .project-card:hover {
-    border-color: #5a7a5a;
-    background-color: #181c17;
+    border-color: #4af626;
+    background-color: #0f120f;
+    box-shadow: 0 0 20px rgba(74, 246, 38, 0.15); /* 은은한 녹색 네온 광원 */
 }
 
 /* 비활성화된 두 번째 카드 스타일 */
 .project-card.disabled {
-    border: 2px dashed #222;
-    background-color: #050605;
-    opacity: 0.4;
+    border: 2px dashed #1a1a1a;
+    background-color: #020302;
+    opacity: 0.25; /* 🔴 더 어둡게 죽여서 선택 불가능함을 강조 */
 }
 
 .project-card.disabled .enter-btn {
-    border-color: #555;
-    color: #555;
+    border-color: #333;
+    color: #333;
     background-color: transparent;
-    pointer-events: none; /* 클릭 안 되게 막음 */
+    pointer-events: none; 
+}
+
+/* 고장난 네온사인 효과 키프레임 */
+@keyframes neonFlicker {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        color: #ff1a1a;
+        text-shadow: 0 0 4px #ff1a1a, 0 0 12px #ff0000, 0 0 30px #ff0000;
+        border-color: #ff1a1a;
+    }
+    20%, 24%, 55% {
+        color: #220000;       /* 🔴 불 꺼졌을 때 암흑 속에서 거의 안 보이도록 더 어둡게 조절 */
+        text-shadow: none;    
+        border-color: #220000; 
+    }
 }
