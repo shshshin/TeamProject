@@ -1,6 +1,9 @@
 let noiseOffset = 0;
+let rainParticles = []; // 비 효과를 위한 배열
+
 let hud; // 2D UI 전용 화면
 let bgm;
+let rainSound;
 let bgmStarted = false;
 let gunSound;
 
@@ -43,14 +46,26 @@ let dealerSpeakTimer = 0;
 function preload() {
   soundFormats("mp3");
   bgm = loadSound("assets/334911__fraskoh__cellar-wind-tube.mp3");
+  rainSound = loadSound("assets/rainSound.mp3");
   gunSound = loadSound("assets/gunboom.mp3");
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight, WEBGL);
   noStroke();
+    // 비 입자 초기 생성
+  for (let i = 0; i < 20; i++) {
+    rainParticles.push({
+      x: random(-248, 248),
+      y: random(-220, 20),
+      z: -695,
+      speed: random(10, 20),
+      len: random(15, 28)
+    });
+  } 
   
-  bgm.setVolume(0.35);
+  bgm.setVolume(0.20);
+  rainSound.setVolume(0.45);
   gunSound.setVolume(0.7);
   
   hud = createGraphics(windowWidth, windowHeight);
@@ -75,6 +90,7 @@ function draw() {
 
   setLighting();
   drawRoom();
+  drawWindowAndRain();
   drawProps();
   drawLamp();
   drawMainStage();
@@ -197,64 +213,84 @@ function updateDialog() {
 // 3. 3D 씬
 // ===============================
 function setLighting() {
-  ambientLight(70, 70, 80);
+  ambientLight(25, 25, 30);
 
-  noiseOffset += 0.05;
-  let flicker = noise(noiseOffset) * 120 + 160;
+  // 형광등 불규칙 깜빡임
+  noiseOffset += 0.004;
+  let baseFlicker = noise(noiseOffset) * 120 + 1000;
+  let finalFlicker = 0;
+
+  let r = random(1);
+
+  if (r < 0.002) {
+    finalFlicker = 10;
+  } else if (r < 0.008) {
+    finalFlicker = random(60, 140);
+  } else {
+    finalFlicker = baseFlicker * 3.5;
+  }
 
   pointLight(
-    flicker,
-    flicker * 0.95,
-    flicker * 0.8,
+    finalFlicker * 0.7,
+    finalFlicker,
+    finalFlicker * 0.7,
     0,
-    -300,
+    -350,
     0
   );
 
   spotLight(
-    255,
-    245,
-    210,
+    finalFlicker * 0.9,
+    finalFlicker * 0.85,
+    finalFlicker * 0.7,
     0,
     -420,
     0,
     0,
     1,
     0,
-    PI / 2.3,
-    6
+    PI / 2.5,
+    4
   );
 
-  pointLight(120, 110, 100, 0, 80, 500);
+  pointLight(50, 45, 40, 0, 80, 500);
+
+  drawingContext.lampBrightness = finalFlicker;
 }
 
 function drawRoom() {
   push();
-  fill(55);
+  fill(25);
+  noStroke();
 
+  // 바닥
   push();
   translate(0, 220, 0);
   rotateX(HALF_PI);
   plane(1800, 1800);
   pop();
 
+  // 천장
   push();
   translate(0, -520, 0);
   rotateX(HALF_PI);
   plane(1800, 1800);
   pop();
 
+  // 정면 벽
   push();
   translate(0, -150, -700);
   plane(1800, 800);
   pop();
 
+  // 왼쪽 벽
   push();
   translate(-700, -150, 0);
   rotateY(HALF_PI);
   plane(1800, 800);
   pop();
 
+  // 오른쪽 벽
   push();
   translate(700, -150, 0);
   rotateY(HALF_PI);
@@ -264,9 +300,58 @@ function drawRoom() {
   pop();
 }
 
+function drawWindowAndRain() {
+  // 창문 프레임
+  push();
+  translate(0, -150, -698);
+  fill(12, 15, 12);
+  stroke(40, 55, 40);
+  strokeWeight(5);
+  rectMode(CENTER);
+
+  // 창문 본체
+  rect(0, 0, 500, 250);
+
+  // 창문 십자 프레임
+  strokeWeight(4);
+  line(-250, 0, 250, 0);
+  line(0, -125, 0, 125);
+
+  pop();
+
+  // 비 효과
+  push();
+  stroke(60, 90, 130, 170);
+  strokeWeight(2.5);
+
+  for (let p of rainParticles) {
+    p.y += p.speed;
+
+    // 창문 안쪽에서만 비가 보이게 제한
+    if (p.x > -248 && p.x < 248 && p.y > -125 && p.y < 125) {
+      line(
+        p.x,
+        p.y - 150,
+        p.z,
+        p.x - 3,
+        p.y - 150 + p.len,
+        p.z
+      );
+    }
+
+    // 아래로 벗어나면 위로 다시 보냄
+    if (p.y > 140) {
+      p.y = random(-130, -80);
+      p.x = random(-248, 248);
+    }
+  }
+
+  pop();
+}
+
 function drawProps() {
   push();
-  fill(38);
+  fill(20);
 
   push();
   translate(-430, -40, -560);
@@ -295,18 +380,32 @@ function drawProps() {
 
 function drawLamp() {
   push();
-  fill(100);
+  noStroke();
   translate(0, -450, 0);
 
+  // 전등 줄
   push();
-  fill(90);
-  box(8, 90, 8);
+  fill(40);
+  box(4, 90, 4);
   pop();
 
+  // 전등 갓
   push();
   translate(0, 55, 0);
-  fill(120, 110, 80);
+  fill(50, 52, 50);
   cylinder(65, 40);
+
+  // 전구
+  let bright = drawingContext.lampBrightness || 0;
+  translate(0, 15, 0);
+
+  if (bright > 200) {
+    emissiveMaterial(240, 255, 200);
+  } else {
+    emissiveMaterial(30, 40, 30);
+  }
+
+  sphere(20);
   pop();
 
   pop();
@@ -315,12 +414,12 @@ function drawLamp() {
 function drawMainStage() {
   push();
   translate(0, 110, 0);
-  fill(70, 42, 25);
+  fill(50,32, 20  );
   box(700, 26, 420);
   pop();
 
   push();
-  fill(45, 28, 18);
+  fill(30, 20, 12);
 
   translate(-250, 180, -120);
   box(25, 120, 25);
@@ -336,39 +435,122 @@ function drawMainStage() {
 
   pop();
 
-  push();
-  translate(0, -40, -160);
-  fill(25);
-
-  push();
-  sphere(48);
-  pop();
-
-  push();
-  translate(0, 120, 0);
-  box(160, 180, 90);
-  pop();
-
-  push();
-  translate(0, 75, 0);
-  box(220, 45, 70);
-  pop();
-
-  pop();
+  drawDealer();
 
   push();
   translate(210, 70, -50);
-  fill(120, 80, 45);
+  fill(90, 60, 35);
   box(130, 55, 90);
   pop();
 
   for (let i = 0; i < 4; i++) {
     push();
     translate(-220 + i * 110, 95, 85);
-    fill(95, 75, 50);
+    fill(70, 55, 40);
     box(70, 10, 70);
     pop();
   }
+}
+
+function drawDealer() {
+  push();
+
+  // 테이블 뒤쪽에 딜러 배치
+  translate(0, -85, -160);
+
+  // 미세한 숨쉬기 모션
+  let breathe = sin(frameCount * 0.05) * 3;
+  translate(0, breathe, 0);
+
+  noStroke();
+
+  // 어두운 재질
+  shininess(10);
+  specularMaterial(20, 20, 25);
+  ambientMaterial(15, 15, 18);
+
+  // =========================
+  // 1. 몸통
+  // =========================
+  push();
+  translate(0, 100, 0);
+  rotateX(0.1);
+  fill(15, 15, 18);
+  box(180, 140, 90);
+
+  // 어깨
+  push();
+  translate(-90, -40, 0);
+  sphere(25);
+  pop();
+
+  push();
+  translate(90, -40, 0);
+  sphere(25);
+  pop();
+
+  pop();
+
+  // =========================
+  // 2. 목
+  // =========================
+  push();
+  translate(0, 10, 0);
+  fill(12, 12, 15);
+  cylinder(12, 50);
+  pop();
+
+  // =========================
+  // 3. 머리
+  // =========================
+  push();
+  translate(0, -40, 10);
+  fill(10, 10, 12);
+  box(70, 85, 75);
+
+  // 붉게 빛나는 눈
+  let eyeGlow = map(drawingContext.lampBrightness || 3500, 0, 3500, 50, 255);
+  emissiveMaterial(eyeGlow, 0, 0);
+  noStroke();
+
+  push();
+  translate(-18, -15, 39);
+  sphere(6);
+  pop();
+
+  push();
+  translate(18, -15, 39);
+  sphere(6);
+  pop();
+
+  pop();
+
+  // 눈 이후 재질 초기화 느낌으로 다시 어두운 재질 적용
+  ambientMaterial(15, 15, 18);
+
+  // =========================
+  // 4. 왼팔
+  // =========================
+  push();
+  translate(-105, 105, 20);
+  rotateZ(0.25);
+  rotateX(0.15);
+  fill(14, 14, 17);
+  cylinder(11, 130);
+  pop();
+
+  // =========================
+  // 5. 오른팔
+  // =========================
+  push();
+  translate(105, 105, 20);
+  rotateZ(-0.25);
+  rotateX(0.15);
+  fill(14, 14, 17);
+  cylinder(11, 130);
+  pop();
+
+  pop();
 }
 
 // ===============================
@@ -958,9 +1140,12 @@ function mousePressed() {
   // intro 또는 roundIntro 상태일 때 스킵 버튼 클릭 처리
   
     if (!bgmStarted) {
-    userStartAudio();
-    bgm.loop();
-    bgmStarted = true;
+  userStartAudio();
+
+  bgm.loop();
+  rainSound.loop();
+
+  bgmStarted = true;
   }
   
   if (gameState === "intro" || gameState === "roundIntro") {
