@@ -532,25 +532,29 @@ function drawDialogBox() {
 }
 
 function drawTopInfo() {
+  let boxX = 70;
+  let boxY = 25;
+  let boxW = 240;
+  let boxH = 115;
+
   hud.fill(0, 190);
-  hud.rect(30, 25, 240, 115, 16);
+  hud.rect(boxX, boxY, boxW, boxH, 16);
 
   hud.stroke(180);
   hud.strokeWeight(1);
   hud.noFill();
-  hud.rect(30, 25, 240, 115, 16);
+  hud.rect(boxX, boxY, boxW, boxH, 16);
   hud.noStroke();
 
   hud.fill(255);
   hud.textAlign(LEFT, TOP);
   hud.textSize(20);
-  hud.text("ROUND : " + round, 50, 45);
+  hud.text("ROUND : " + round, boxX + 20, boxY + 20);
 
   hud.textSize(16);
-  hud.text("현재 탄 수 : " + bullets.length, 50, 78);
-  hud.text("아이템 사용 : " + itemUseCount + " / " + maxItemUseCount, 50, 105);
+  hud.text("현재 탄 수 : " + bullets.length, boxX + 20, boxY + 53);
+  hud.text("아이템 사용 : " + itemUseCount + " / " + maxItemUseCount, boxX + 20, boxY + 80);
 }
-
 function drawBulletInfoPanel() {
   let liveCount = 0;
   let blankCount = 0;
@@ -724,14 +728,16 @@ function drawEndScreen(title, subtitle) {
 // ===============================
 function makeRandomItems() {
   let randomItemPool = [
-    "돋보기",
-    "휴대전화",
-    "자석",
-    "고양이 상자",
-    "초콜렛",
-    "어금니",
-    "다이아몬드"
-  ];
+  "돋보기",
+  "휴대전화",
+  "자석",
+  "고양이 상자",
+  "초콜렛",
+  "어금니",
+  "립스틱",
+  "주사위",
+  "다이아몬드"
+];
 
   shuffle(randomItemPool, true);
 
@@ -796,12 +802,27 @@ function getItemDescription(itemName) {
   } else if (itemName === "초콜렛") {
     return "초콜렛\n실탄 2발을 추가하고 탄을 섞습니다.\n대신 이번 턴 실탄을 맞아도 10% 확률로 생존합니다.";
   } else if (itemName === "어금니") {
-    return "어금니\n실탄 1발을 추가하고 탄을 섞습니다.\n섞인 결과는 알 수 없습니다.";
+  return "어금니\n실탄 1발을 추가하고 탄을 섞습니다.\n섞인 결과는 알 수 없습니다.";
+  } else if (itemName === "립스틱") {
+    return "립스틱\n현재 배열된 탄의 순서를 뒤로 한 칸 미룹니다.";
+  } else if (itemName === "주사위") {
+    return "주사위\n현재 배열된 탄의 순서를 뒤로 두 칸 미룹니다.";
   } else if (itemName === "다이아몬드") {
     return "다이아몬드\n실탄 개수를 공포탄 개수와 같게 바꾸고 섞습니다.\n단, 아이템 사용 전이어야만 사용할 수 있습니다.";
   }
 
   return "";
+}
+
+function rotateBulletsBack(step) {
+  if (bullets.length <= 1) return;
+
+  let moveCount = step % bullets.length;
+
+  for (let i = 0; i < moveCount; i++) {
+    let lastBullet = bullets.pop();
+    bullets.unshift(lastBullet);
+  }
 }
 
 function useItem(index) {
@@ -883,6 +904,20 @@ function useItem(index) {
     shuffle(bullets, true);
 
     message = "어금니 사용: 실탄 1발이 추가되고 탄이 섞였습니다.";
+    itemUseCount++;
+  }
+
+  else if (item === "립스틱") {
+  rotateBulletsBack(1);
+
+  message = "립스틱 사용: 탄의 순서를 뒤로 한 칸 미뤘습니다.";
+  itemUseCount++;
+  }
+
+  else if (item === "주사위") {
+    rotateBulletsBack(2);
+
+    message = "주사위 사용: 탄의 순서를 뒤로 두 칸 미뤘습니다.";
     itemUseCount++;
   }
 
