@@ -153,7 +153,7 @@ function startRound(r) {
   if (round === 1) {
     bullets = ["실탄", "실탄", "실탄", "실탄", "공포탄", "공포탄"];
   } else {
-    bullets = ["실탄", "실탄", "실탄", "실탄", "공포탄"];
+    bullets = ["실탄", "실탄", "실탄", "공포탄"];
   }
 
   shuffle(bullets, true);
