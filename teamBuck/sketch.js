@@ -974,7 +974,7 @@ function getItemDescription(itemName) {
   if (itemName === "돋보기") {
     return "돋보기\n현재 장전된 탄의 종류를 확인합니다.";
   } else if (itemName === "휴대전화") {
-    return "휴대전화\n현재 탄을 제외한 랜덤한 위치의 탄 정보를 알려줍니다.\n랜덤 아이템이므로 사용 횟수를 1회 소모합니다.";
+  return "휴대전화\n현재 탄을 제외한 랜덤한 위치의 탄 2개 정보를 알려줍니다.\n랜덤 아이템이므로 사용 횟수를 1회 소모합니다.";
   } else if (itemName === "기본 휴대전화") {
     return "기본 휴대전화\n현재 탄을 제외한 랜덤한 위치의 탄 정보를 알려줍니다.\n기본 지급 아이템이므로 사용 횟수를 소모하지 않습니다.";
   } else if (itemName === "자석") {
@@ -1028,15 +1028,43 @@ function useItem(index) {
   }
 
   else if (item === "휴대전화") {
-    if (bullets.length <= 1) {
-      message = "휴대전화 사용 실패: 확인할 다른 탄이 없습니다.";
-    } else {
-      let randomIndex = floor(random(1, bullets.length));
-      message = "휴대전화: " + (randomIndex + 1) + "번째 탄은 [" + bullets[randomIndex] + "]입니다.";
+  if (bullets.length <= 1) {
+    message = "휴대전화 사용 실패: 확인할 다른 탄이 없습니다.";
+  } else {
+    // 현재 탄인 0번을 제외하고 확인 가능한 인덱스 목록 만들기
+    let possibleIndexes = [];
+
+    for (let i = 1; i < bullets.length; i++) {
+      possibleIndexes.push(i);
     }
 
-    itemUseCount++;
+    // 인덱스 순서를 섞어서 랜덤하게 만들기
+    shuffle(possibleIndexes, true);
+
+    // 최대 2개까지 확인
+    let checkCount = min(2, possibleIndexes.length);
+
+    message = "휴대전화 사용: ";
+
+    for (let i = 0; i < checkCount; i++) {
+      let bulletIndex = possibleIndexes[i];
+
+      message +=
+        (bulletIndex + 1) +
+        "번째 탄은 [" +
+        bullets[bulletIndex] +
+        "]";
+
+      if (i < checkCount - 1) {
+        message += ", ";
+      }
+    }
+
+    message += "입니다.";
   }
+
+  itemUseCount++;
+}
 
   else if (item === "기본 휴대전화") {
     if (bullets.length <= 1) {
